@@ -8,10 +8,13 @@ module Hypester
       @properties = ActiveSupport::OrderedHash.new
     end
 
-    def property(*properties)
-      properties.each do |name|
-        @properties[name] = @object.send(name)
-      end
+    def property(name, value = object.send(name))
+      @properties[name] = value
+      self
+    end
+
+    def properties(*properties)
+      properties.each { |name| property name }
       self
     end
 
@@ -22,8 +25,7 @@ module Hypester
       self
     end
 
-    def embed(rel, object = nil)
-      object = @object.send(rel) if object.nil? && @object.respond_to?(rel)
+    def embed(rel, object = object.send(rel))
       return unless object
 
       result = if object.respond_to?(:to_ary)
@@ -46,7 +48,7 @@ module Hypester
     end
 
     def partial!
-      render @object
+      render object
       self
     end
 
@@ -57,6 +59,14 @@ module Hypester
     # Internal
     def resource(object)
       Resource.new(@view, object)
+    end
+
+    def method_missing(*args)
+      property *args
+    end
+
+    def respond_to?(*args)
+      super || object.respond_to?(*args)
     end
   end
 end

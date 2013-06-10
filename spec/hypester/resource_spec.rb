@@ -9,14 +9,56 @@ describe Hypester::Resource do
     resource.object.should == object
   end
 
+  describe 'method_missing' do
+    it 'extracts the property' do
+      resource.name
+      expect(resource.as_json).to eql('name' => 'Brandon')
+    end
+
+    it 'uses given value' do
+      resource.jeans 'skinny'
+      expect(resource.as_json).to eql('jeans' => 'skinny')
+    end
+  end
+
+  describe 'respond_to?' do
+    it 'is true for defined methods' do
+      expect(resource).to respond_to(:property)
+    end
+
+    it 'is true for methods on the object' do
+      expect(resource).to respond_to(:name)
+    end
+
+    it 'is false for methods not defined on the object' do
+      expect(resource).to_not respond_to(:never_heard_of_it)
+    end
+  end
+
   describe 'property' do
-    it 'extracts properties from context' do
-      resource.property :id, :name
-      expect(resource.as_json).to eql('id' => 1, 'name' => 'Brandon')
+    it 'extracts the properties from the object' do
+      resource.property :id
+      expect(resource.as_json).to eql('id' => 1)
+    end
+
+    it 'uses the given value' do
+      resource.property :favorite_beer, 'PBR'
+      expect(resource.as_json).to eql('favorite_beer' => 'PBR')
     end
 
     it 'returns itself' do
       expect(resource.property(:id)).to be(resource)
+    end
+  end
+
+  describe 'properties' do
+    it 'extracts the given properties' do
+      resource.properties :id, :name
+      expect(resource.as_json).to eql('id' => 1, 'name' => 'Brandon')
+    end
+
+    it 'returns itself' do
+      expect(resource.properties(:id)).to be(resource)
     end
   end
 
