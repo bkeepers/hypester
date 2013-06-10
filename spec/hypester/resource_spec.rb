@@ -14,12 +14,20 @@ describe Hypester::Resource do
       resource.property :id, :name
       expect(resource.as_json).to eql('id' => 1, 'name' => 'Brandon')
     end
+
+    it 'returns itself' do
+      expect(resource.property(:id)).to be(resource)
+    end
   end
 
   describe 'link' do
     it 'adds links' do
       resource.link :self, '/self'
       expect(resource.as_json).to eql('_links' => {'self' => {'href' => '/self'}})
+    end
+
+    it 'returns itself' do
+      expect(resource.link(:self, '/self')).to be(resource)
     end
   end
 
@@ -40,6 +48,12 @@ describe Hypester::Resource do
         :r => instance_of(Hypester::Resource))
 
       resource.embed :thing, dog
+    end
+
+    it 'returns itself' do
+      view.stub! :render
+
+      expect(resource.embed(:dog, dog)).to be(resource)
     end
   end
 end

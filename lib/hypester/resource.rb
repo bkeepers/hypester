@@ -12,12 +12,14 @@ module Hypester
       properties.each do |name|
         @properties[name] = @object.send(name)
       end
+      self
     end
 
     def link(*args)
       link = Link.new(*args)
       @properties[:_links] ||= ActiveSupport::OrderedHash.new
       @properties[:_links][link.rel] = link
+      self
     end
 
     def embed(rel, object = nil)
@@ -34,11 +36,13 @@ module Hypester
 
       @properties[:_embedded] ||= ActiveSupport::OrderedHash.new
       @properties[:_embedded][rel.to_s] = result
+      self
     end
 
     def render(*args)
       options = args.extract_options!
       @view.render *args.push(options.merge(:r => self))
+      self
     end
 
     def partial!
