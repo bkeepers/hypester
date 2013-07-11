@@ -22,6 +22,10 @@ describe Hypester::Template, :type => :view do
     context 'embedding' do
       class Category < Struct.new(:name)
         extend ActiveModel::Naming
+
+        def to_partial_path
+          'categories/category'
+        end
       end
 
       before { stub_template 'categories/_category.hype' => "r.property :name" }

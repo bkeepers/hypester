@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Hypester::Resource do
-  let(:view) { mock(:view) }
-  let(:object) { mock(:object, :id => 1, :name => 'Brandon') }
+  let(:view) { double(:view) }
+  let(:object) { double(:object, :id => 1, :name => 'Brandon') }
   let(:resource) { Hypester::Resource.new(view, object) }
 
   it 'has an object accessor' do
@@ -74,9 +74,9 @@ describe Hypester::Resource do
   end
 
   describe 'embed' do
-    let(:dog) { mock(:dog) }
+    let(:dog) { double(:dog) }
 
-    before { object.stub! :dog => dog }
+    before { object.stub :dog => dog }
 
     it 'renders a partial using the object from the named property' do
       view.should_receive(:render).with(dog,
@@ -93,7 +93,7 @@ describe Hypester::Resource do
     end
 
     it 'returns itself' do
-      view.stub! :render
+      view.stub :render
 
       expect(resource.embed(:dog, dog)).to be(resource)
     end
