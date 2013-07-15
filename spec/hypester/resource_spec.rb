@@ -68,6 +68,15 @@ describe Hypester::Resource do
       expect(resource.as_json).to eql('_links' => {'self' => {'href' => '/self'}})
     end
 
+    it 'converts to an array of links with multiple values' do
+      resource.link :job, '/janitor'
+      resource.link :job, '/painter'
+      expect(resource.as_json).to eql('_links' => {'job' => [
+        {'href' => '/janitor'},
+        {'href' => '/painter'}
+      ]})
+    end
+
     it 'returns itself' do
       expect(resource.link(:self, '/self')).to be(resource)
     end

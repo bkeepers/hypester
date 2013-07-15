@@ -20,8 +20,11 @@ module Hypester
 
     def link(*args)
       link = Link.new(*args)
-      @properties[:_links] ||= ActiveSupport::OrderedHash.new
-      @properties[:_links][link.rel] = link
+      links[link.rel] = if links[link.rel]
+        Array(links[link.rel]) << link
+      else
+        link
+      end
       self
     end
 
@@ -36,8 +39,7 @@ module Hypester
 
       Array.wrap(result).each(&:partial!)
 
-      @properties[:_embedded] ||= ActiveSupport::OrderedHash.new
-      @properties[:_embedded][rel.to_s] = result
+      embedded[rel.to_s] = result
       self
     end
 
@@ -56,17 +58,27 @@ module Hypester
       @properties.as_json(options)
     end
 
-    # Internal
-    def resource(object)
-      Resource.new(@view, object)
-    end
-
     def method_missing(*args)
       property *args
     end
 
     def respond_to?(*args)
       super || object.respond_to?(*args)
+    end
+
+    # Internal
+    def links
+      @properties[:_links] ||= ActiveSupport::OrderedHash.new
+    end
+
+    # Internal
+    def embedded
+      @properties[:_embedded] ||= ActiveSupport::OrderedHash.new
+    end
+
+    # Internal
+    def resource(object)
+      Resource.new(@view, object)
     end
   end
 end
