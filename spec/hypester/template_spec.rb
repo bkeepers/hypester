@@ -19,6 +19,24 @@ describe Hypester::Template, :type => :view do
       expect(MultiJson.load(json)).to eql({'_links' => {'self' => {'href' => 'http://example.com/'}}})
     end
 
+    it 'does not pretty print json by default' do
+      json = render "resource {|r| r.link :foo, '/foo' }"
+      expect(json).to_not include("\n")
+    end
+
+    {
+      'Safari' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.56 Safari/536.5',
+      'Curl' => 'curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8x zlib/1.2.5',
+      'Wget' => 'Wget/1.9.1'
+    }.each do |name, useragent|
+      it "pretty prints for #{name}" do
+        view.request.stub :user_agent => useragent
+        json = render "resource {|r| r.foo 'bar' }"
+        expect(json).to include("\n")
+        expect(json[-1]).to eql("\n")
+      end
+    end
+
     context 'embedding' do
       class Category < Struct.new(:name)
         extend ActiveModel::Naming
