@@ -14,7 +14,7 @@ module Hypester
 
     def self.call(template)
       "extend Hypester::TemplateMethods; " +
-      "begin;#{template.source};end.to_json"
+      "MultiJson.dump(begin;#{template.source};end)"
     end
   end
 end
